@@ -1,0 +1,13 @@
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+frontend/dist/
+backend/.env
+backend/*.log
+smoke_log.txt
+backend/smoke_log.txt
+backend/smoke_verify_log.txt
+*.log
+.DS_Store
+.vscode/
+coverage/
