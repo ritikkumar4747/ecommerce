@@ -11,3 +11,9 @@ backend/smoke_verify_log.txt
 .DS_Store
 .vscode/
 coverage/
+
+# Large media assets
+frontend\public\181536-866999858_medium.mp4
+frontend\public\12629244_1080_1920_30fps.mp4
+frontend\public\6266292-uhd_3840_2160_25fps.mp4
+frontend\public\12062275_1080_1920_60fps.mp4
