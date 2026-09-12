@@ -25,11 +25,6 @@ export default function SellerDashboard() {
   const [ordersLoading, setOrdersLoading] = useState(true)
   const [ordersMessage, setOrdersMessage] = useState(null)
 
-  useEffect(() => {
-    fetchProducts()
-    fetchOrders()
-  }, [])
-
   const fetchProducts = async () => {
     setProductsLoading(true)
     try {
@@ -53,6 +48,35 @@ export default function SellerDashboard() {
       setOrdersLoading(false)
     }
   }
+
+  useEffect(() => {
+    let active = true
+
+    const loadData = async () => {
+      try {
+        const pRes = await Api.get('/products/seller/me')
+        if (active) setProducts(pRes.data.products || [])
+      } catch (err) {
+        console.error(err)
+      } finally {
+        if (active) setProductsLoading(false)
+      }
+
+      try {
+        const oRes = await Api.get('/orders/seller/me')
+        if (active) setOrders(oRes.data || [])
+      } catch (err) {
+        console.error(err)
+      } finally {
+        if (active) setOrdersLoading(false)
+      }
+    }
+
+    loadData()
+    return () => {
+      active = false
+    }
+  }, [])
 
   const handleFiles = (e) => {
     const files = Array.from(e.target.files)

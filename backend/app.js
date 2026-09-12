@@ -11,12 +11,28 @@ import addressRoutes from "./routes/address.routes.js";
 
 const createApp = () => {
   const app = express();
+
+  // Trust first proxy for secure cookies behind reverse proxies (Render, Railway, Heroku, etc.)
+  app.set("trust proxy", 1);
+
   app.use(express.json());
   app.use(helmet());
   app.use(cookieParser());
+
+  const allowedOrigins = process.env.FRONTEND_ORIGIN
+    ? process.env.FRONTEND_ORIGIN.split(",").map((o) => o.trim())
+    : ["http://localhost:5173"];
+
   app.use(
     cors({
-      origin: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
+      origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. curl, tests, mobile)
+        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes("*")) {
+          callback(null, true);
+        } else {
+          callback(new Error(`Origin ${origin} not allowed by CORS`));
+        }
+      },
       credentials: true,
     })
   );

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.models.js";
+import { getAuthCookieOptions } from "./cookieOptions.js";
 
 export const refreshToken = async (req, res) => {
     try {
@@ -23,11 +24,7 @@ export const refreshToken = async (req, res) => {
             { expiresIn: "15m" }
         );
 
-        res.cookie("accessToken", newAccessToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 15 * 60 * 1000
-        });
+        res.cookie("accessToken", newAccessToken, getAuthCookieOptions(15 * 60 * 1000));
 
         res.json({ message: "Access token refreshed" });
 

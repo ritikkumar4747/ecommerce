@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function Logo({ className = "h-8" }) {
   return (
     <svg className={`${className} text-white fill-current overflow-visible`} viewBox="0 0 280 60" xmlns="http://www.w3.org/2000/svg">

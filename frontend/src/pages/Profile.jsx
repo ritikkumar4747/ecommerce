@@ -26,7 +26,7 @@ export default function Profile(){
       setProfile(prev=>({...prev, role: res.data.role}));
       setUser(prev=>({...prev, role: res.data.role}));
       alert('You are now admin');
-    }catch(err){ alert('Failed to promote'); }
+    }catch{ alert('Failed to promote'); }
   }
 
   if(loading) return <div className="pt-32 text-center text-white bg-zinc-950 min-h-screen">Loading profile...</div>;
@@ -79,7 +79,7 @@ export default function Profile(){
                 <div className="text-sm text-zinc-300">{a.recipientName} — {a.line1}{a.line2?(', '+a.line2):''}, {a.city} {a.postalCode}</div>
               </div>
               <div className="flex gap-2">
-                <button onClick={async ()=>{ try{ await Api.delete('/addresses/'+a._id); setAddresses(prev=>prev.filter(x=>x._id!==a._id)); }catch(e){alert('Delete failed')}}} className="text-xs px-3 py-1 bg-rose-600 rounded">Delete</button>
+                <button onClick={async ()=>{ try{ await Api.delete('/addresses/'+a._id); setAddresses(prev=>prev.filter(x=>x._id!==a._id)); }catch{alert('Delete failed');}}} className="text-xs px-3 py-1 bg-rose-600 rounded">Delete</button>
                 <button onClick={()=>{ setEditingId(a._id); setNewAddress({ recipientName: a.recipientName||'', line1: a.line1||'', line2: a.line2||'', city: a.city||'', state: a.state||'', postalCode: a.postalCode||'', country: a.country||'', phone: a.phone||'', label: a.label||'', isDefault: a.isDefault||false }); }} className="text-xs px-3 py-1 bg-zinc-700 rounded">Edit</button>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function Profile(){
                 }
                 setNewAddress({ recipientName: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: '', phone: '', label: '', isDefault: false });
                 setAddressErrors({});
-              }catch(e){ alert('Save failed') }
+              }catch{ alert('Save failed'); }
             }} className="py-2 px-4 bg-white text-black rounded">{editingId? 'Save Address' : 'Add Address'}</button>
 
             {editingId && <button onClick={()=>{ setEditingId(null); setNewAddress({ recipientName: '', line1: '', line2: '', city: '', state: '', postalCode: '', country: '', phone: '', label: '', isDefault: false }); setAddressErrors({}); }} className="py-2 px-4 bg-zinc-800 text-white rounded">Cancel</button>}

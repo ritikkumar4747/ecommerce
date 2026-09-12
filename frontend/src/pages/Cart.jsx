@@ -29,15 +29,43 @@ export default function Cart() {
     try {
       const res = await Api.get('/cart')
       setCart(res.data || { items: [] })
-      // fetch saved addresses
-      try{ const aRes = await Api.get('/addresses'); setAddresses(aRes.data || []); if(aRes.data && aRes.data.length>0) setSelectedAddressId(aRes.data.find(x=>x.isDefault)?._id || aRes.data[0]._id); }catch(e){}
     } catch (err) {
       console.error('fetch cart', err)
       setError(err?.response?.data?.error || 'Unable to fetch cart')
-    } finally { setLoading(false) }
+    }
   }
 
-  useEffect(() => { fetchCart() }, [])
+  useEffect(() => {
+    let active = true
+    const loadCartAndAddresses = async () => {
+      try {
+        const res = await Api.get('/cart')
+        if (active) setCart(res.data || { items: [] })
+        try {
+          const aRes = await Api.get('/addresses')
+          if (active) {
+            setAddresses(aRes.data || [])
+            if (aRes.data && aRes.data.length > 0) {
+              setSelectedAddressId(aRes.data.find(x => x.isDefault)?._id || aRes.data[0]._id)
+            }
+          }
+        } catch {
+          // address fetch failure is non-fatal
+        }
+      } catch (err) {
+        if (active) {
+          console.error('fetch cart', err)
+          setError(err?.response?.data?.error || 'Unable to fetch cart')
+        }
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    loadCartAndAddresses()
+    return () => {
+      active = false
+    }
+  }, [])
 
   const updateQty = async (productId, qty) => {
     if (qty < 1) return;
@@ -71,7 +99,7 @@ export default function Cart() {
       }
 
       const res = await Api.post('/orders/checkout', body)
-      const { razorpayOrder, razorpayKey, order } = res.data
+      const { razorpayOrder, razorpayKey } = res.data
       await loadRazorpay()
 
       const options = {
@@ -83,7 +111,7 @@ export default function Cart() {
         order_id: razorpayOrder.id,
         handler: async function (response) {
           try {
-            const verify = await Api.post('/orders/verify', response)
+            await Api.post('/orders/verify', response)
             alert('Payment successful')
             navigate('/orders')
           } catch (err) {

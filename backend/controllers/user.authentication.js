@@ -1,6 +1,7 @@
 import User from "../models/user.models.js";
 import validate from "../utils/validator.js";
 import { redisclient } from "../config/redisclient.js";
+import { getAuthCookieOptions } from "../utils/cookieOptions.js";
 
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -67,17 +68,8 @@ export const register = async (req, res) => {
         await user.save();
 
         //  Send tokens in cookies
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 15 * 60 * 1000
-        });
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie("accessToken", accessToken, getAuthCookieOptions(15 * 60 * 1000));
+        res.cookie("refreshToken", refreshToken, getAuthCookieOptions(7 * 24 * 60 * 60 * 1000));
 
         res.status(201).json({
             message: "User registered successfully"
@@ -120,17 +112,8 @@ export const login=async(req,res)=>{
         await user.save();
 
         //  Send tokens in cookies
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 15 * 60 * 1000
-        });
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        res.cookie("accessToken", accessToken, getAuthCookieOptions(15 * 60 * 1000));
+        res.cookie("refreshToken", refreshToken, getAuthCookieOptions(7 * 24 * 60 * 60 * 1000));
         res.status(200).json({message:"User logged in successfully"});
     }
     catch(err){
@@ -166,8 +149,8 @@ export const logout = async (req, res) => {
         }
 
         //Clear cookies
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+        res.clearCookie("accessToken", getAuthCookieOptions());
+        res.clearCookie("refreshToken", getAuthCookieOptions());
 
         res.status(200).json({ message: "Logged out successfully" });
 
